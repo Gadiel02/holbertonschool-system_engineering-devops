@@ -1,0 +1,21 @@
+graph TD;
+    A[User] -->|Requests| B[Nginx Web Server];
+    B -->|Forwards Requests| C[Application Server];
+    C -->|Accesses| D[Application Files - Codebase];
+    C -->|Queries| E[MySQL Database];
+
+    %% Issues
+    B -.->|SPOF| X[Single Point of Failure];
+    C -.->|SPOF| X;
+    E -.->|SPOF| X;
+    
+    X -.->|Causes| Y[Downtime During Maintenance];
+    X -.->|Causes| Z[Scalability Limitations];
+
+    %% External Dependencies
+    A -.->|DNS Resolves| F[8.8.8.8];
+    F -->|Points to| B;
+
+    %% Notes
+    classDef issue fill:#f96,stroke:#f00,stroke-width:2px;
+    X,Y,Z class issue;

@@ -1,0 +1,20 @@
+graph TD;
+    A[User's Computer] -->|Requests| B[DNS Server];
+    B -->|Resolves to| C[Server 1: Load Balancer (HAProxy)];
+
+    %% Load Balancer
+    C -->|Round Robin| D[Server 2: Web/Application Server];
+
+    %% Web/Application Server
+    D -->|Handles Requests| E[Nginx];
+    E -->|Processes| F[Application Server];
+    F -->|Accesses| G[Code Base];
+    F -->|Queries| H[Server 3: Database Server];
+
+    %% Database Layer
+    H -->|Read/Write| I[MySQL Primary (Master)];
+    I -->|Replication| J[MySQL Replica (Slave)];
+
+    %% Notes
+    classDef db fill:#f96,stroke:#f00,stroke-width:2px;
+    I,J class db;
