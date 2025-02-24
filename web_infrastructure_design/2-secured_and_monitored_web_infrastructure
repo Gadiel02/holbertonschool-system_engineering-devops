@@ -20,7 +20,7 @@ graph TD;
     I -->|Forwards Queries| J[MySQL Primary];
     J -->|Replication| K[MySQL Replica];
 
-    %% Monitoring Clients
+    %% Additional Monitoring Clients
     J -->|Monitored by| M2[Monitoring Client];
     K -->|Monitored by| M2;
     E -->|Monitored by| M1;
