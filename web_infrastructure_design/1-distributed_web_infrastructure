@@ -1,20 +1,40 @@
 graph TD;
+    %% User and DNS
     A[User's Computer] -->|Requests| B[DNS Server];
-    B -->|Resolves to| C[Server 1: Load Balancer (HAProxy)];
 
-    %% Load Balancer
-    C -->|Round Robin| D[Server 2: Web/Application Server];
+    %% Firewalls and Load Balancer
+    B -->|Routes Traffic| C[Firewall 1];
+    C -->|Passes Through| D[Firewall 2];
+    D -->|Forwards to| E[HAProxy - SSL Termination];
 
-    %% Web/Application Server
-    D -->|Handles Requests| E[Nginx];
-    E -->|Processes| F[Application Server];
-    F -->|Accesses| G[Code Base];
-    F -->|Queries| H[Server 3: Database Server];
+    %% Monitoring and Traffic Routing
+    E -->|Distributes Load| F[Nginx];
+    E -->|Monitored by| M1[Monitoring Client];
+
+    %% Application Server and Code
+    F -->|Handles Requests| G[Application Server];
+    G -->|Accesses| H[Code Base];
 
     %% Database Layer
-    H -->|Read/Write| I[MySQL Primary (Master)];
-    I -->|Replication| J[MySQL Replica (Slave)];
+    G -->|Queries| I[Firewall 3];
+    I -->|Forwards Queries| J[MySQL Primary];
+    J -->|Replication| K[MySQL Replica];
 
-    %% Notes
+    %% Monitoring Clients
+    J -->|Monitored by| M2[Monitoring Client];
+    K -->|Monitored by| M2;
+    E -->|Monitored by| M1;
+    G -->|Monitored by| M1;
+
+    %% Final Firewall and Monitoring Service
+    J -->|Passes Logs| L[Firewall 4];
+    L -->|Sends Data| M[Monitoring Service - Sumo Logic];
+
+    %% Styling for Important Components
+    classDef firewall fill:#ffcc00,stroke:#ff6600,stroke-width:2px;
     classDef db fill:#f96,stroke:#f00,stroke-width:2px;
-    I,J class db;
+    classDef monitor fill:#cfc,stroke:#080,stroke-width:2px;
+
+    C,D,I,L class firewall;
+    J,K class db;
+    M1,M2,M class monitor;

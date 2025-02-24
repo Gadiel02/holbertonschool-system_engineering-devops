@@ -1,7 +1,7 @@
 graph TD;
     %% User and DNS
     A[User's Computer] -->|Requests| B[DNS Server];
-    
+
     %% Firewalls and Load Balancer
     B -->|Routes Traffic| C[Firewall 1];
     C -->|Passes Through| D[Firewall 2];
@@ -9,7 +9,7 @@ graph TD;
 
     %% Monitoring and Traffic Routing
     E -->|Distributes Load| F[Nginx];
-    E -->|Monitored by| X[Monitoring Client];
+    E -->|Monitored by| M1[Monitoring Client];
 
     %% Application Server and Code
     F -->|Handles Requests| G[Application Server];
@@ -19,12 +19,12 @@ graph TD;
     G -->|Queries| I[Firewall 3];
     I -->|Forwards Queries| J[MySQL Primary];
     J -->|Replication| K[MySQL Replica];
-    
-    %% Monitoring Services
-    J -->|Monitored by| Y[Monitoring Client];
-    K -->|Monitored by| Y;
-    E -->|Monitored by| X;
-    G -->|Monitored by| X;
+
+    %% Monitoring Clients
+    J -->|Monitored by| M2[Monitoring Client];
+    K -->|Monitored by| M2;
+    E -->|Monitored by| M1;
+    G -->|Monitored by| M1;
 
     %% Final Firewall and Monitoring Service
     J -->|Passes Logs| L[Firewall 4];
@@ -37,4 +37,4 @@ graph TD;
 
     C,D,I,L class firewall;
     J,K class db;
-    X,Y,M class monitor;
+    M1,M2,M class monitor;

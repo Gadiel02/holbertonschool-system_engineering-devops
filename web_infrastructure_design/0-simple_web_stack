@@ -1,21 +1,40 @@
 graph TD;
-    A[User] -->|Requests| B[Nginx Web Server];
-    B -->|Forwards Requests| C[Application Server];
-    C -->|Accesses| D[Application Files - Codebase];
-    C -->|Queries| E[MySQL Database];
+    %% User and DNS
+    A[User's Computer] -->|Requests| B[DNS Server];
 
-    %% Issues
-    B -.->|SPOF| X[Single Point of Failure];
-    C -.->|SPOF| X;
-    E -.->|SPOF| X;
-    
-    X -.->|Causes| Y[Downtime During Maintenance];
-    X -.->|Causes| Z[Scalability Limitations];
+    %% Firewalls and Load Balancer
+    B -->|Routes Traffic| C[Firewall 1];
+    C -->|Passes Through| D[Firewall 2];
+    D -->|Forwards to| E[HAProxy - SSL Termination];
 
-    %% External Dependencies
-    A -.->|DNS Resolves| F[8.8.8.8];
-    F -->|Points to| B;
+    %% Monitoring and Traffic Routing
+    E -->|Distributes Load| F[Nginx];
+    E -->|Monitored by| M1[Monitoring Client];
 
-    %% Notes
-    classDef issue fill:#f96,stroke:#f00,stroke-width:2px;
-    X,Y,Z class issue;
+    %% Application Server and Code
+    F -->|Handles Requests| G[Application Server];
+    G -->|Accesses| H[Code Base];
+
+    %% Database Layer
+    G -->|Queries| I[Firewall 3];
+    I -->|Forwards Queries| J[MySQL Primary];
+    J -->|Replication| K[MySQL Replica];
+
+    %% Monitoring Clients
+    J -->|Monitored by| M2[Monitoring Client];
+    K -->|Monitored by| M2;
+    E -->|Monitored by| M1;
+    G -->|Monitored by| M1;
+
+    %% Final Firewall and Monitoring Service
+    J -->|Passes Logs| L[Firewall 4];
+    L -->|Sends Data| M[Monitoring Service - Sumo Logic];
+
+    %% Styling for Important Components
+    classDef firewall fill:#ffcc00,stroke:#ff6600,stroke-width:2px;
+    classDef db fill:#f96,stroke:#f00,stroke-width:2px;
+    classDef monitor fill:#cfc,stroke:#080,stroke-width:2px;
+
+    C,D,I,L class firewall;
+    J,K class db;
+    M1,M2,M class monitor;
